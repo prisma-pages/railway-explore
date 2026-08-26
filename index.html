@@ -1,26 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Realidade Aumentada - Peça 3D</title>
 
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- A-Frame (Renderizador 3D) -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    
+    <!-- MindAR (Reconhecimento de Imagem / AR) -->
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-</head>
 
-<body>
-    <a-scene mindar-image="imageTargetSrc: ./seu-card-treinado.mind;" color-space="sRGB"
-        renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false"
-        device-orientation-permission-ui="enabled: false">
-        <a-assets>
-            <a-asset-item id="pecaModelo" src="./sua-peca.glb"></a-asset-item>
-        </a-assets>
+    <style>
+      body, html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+      }
 
-        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      /* Tla de Carregamento personalizada */
+      #ui-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 999;
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        box-sizing: border-box;
+      }
 
-        <a-entity mindar-image-target="targetIndex: 0">
-            <a-gltf-model src="#pecaModelo" position="0 0 0" scale="0.5 0.5 0.5" rotation="0 0 0"></a-gltf-model>
-        </a-entity>
+      .instrucao-card {
+        background: rgba(0, 0, 0, 0.7);
+        color: #ffffff;
+        padding: 12px 24px;
+        border-radius: 30px;
+        font-size: 14px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Interface por cima da câmera -->
+    <div id="ui-container">
+      <div class="instrucao-card">
+        Apunte a câmera para o card
+      </div>
+    </div>
+
+    <!-- Cena de Realidade Aumentada -->
+    <a-scene 
+      mindar-image="imageTargetSrc: ./card.mind; filterMinCF:0.0001; filterBeta: 0.001;" 
+      color-space="sRGB" 
+      renderer="colorManagement: true, physicallyCorrectLights: true, exposure: 1.0" 
+      vr-mode-ui="enabled: false" 
+      device-orientation-permission-ui="enabled: false">
+      
+      <!-- Pré-carregamento dos Recursos (Assets) -->
+      <a-assets>
+        <a-asset-item id="modeloPeca" src="./modelo.glb"></a-asset-item>
+      </a-assets>
+
+      <!-- Iluminação para dar realismo à peça 3D -->
+      <a-light type="ambient" intensity="1.2"></a-light>
+      <a-light type="directional" intensity="1.5" position="1 2 1"></a-light>
+
+      <!-- Câmera AR -->
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <!-- Marcador 0 (Vinculado ao card.mind) -->
+      <a-entity mindar-image-target="targetIndex: 0">
+        <!-- 
+          Modelo 3D:
+          - position: X Y Z (posição relativa ao card)
+          - scale: X Y Z (tamanho da peça - se ficar gigante ou minúscula, ajuste estes valores)
+          - rotation: X Y Z (rotação em graus)
+        -->
+        <a-gltf-model 
+          src="#modeloPeca" 
+          position="0 0 0" 
+          scale="0.2 0.2 0.2" 
+          rotation="0 0 0">
+        </a-gltf-model>
+      </a-entity>
     </a-scene>
-</body>
 
+    <script>
+      // Opcional: Interações ao detectar ou perder o card
+      const target = document.querySelector('[mindar-image-target]');
+      const instrucao = document.querySelector('.instrucao-card');
+
+      target.addEventListener("targetFound", () => {
+        instrucao.textContent = "Peça reconhecida!";
+        instrucao.style.background = "rgba(46, 125, 50, 0.8)";
+      });
+
+      target.addEventListener("targetLost", () => {
+        instrucao.textContent = "Apunte a câmera para o card";
+        instrucao.style.background = "rgba(0, 0, 0, 0.7)";
+      });
+    </script>
+  </body>
 </html>
