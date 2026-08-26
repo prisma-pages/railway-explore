@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta charset="UTF-8" />
+    <title>Card AR</title>
+
+    <!-- Bibliotecas de WebAR -->
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+    <!-- Redirecionamento automático se aberto pelo WhatsApp/Instagram no Android -->
+    <script>
+        const ua = navigator.userAgent || navigator.vendor;
+        if ((ua.includes('Instagram') || ua.includes('WhatsApp')) && /Android/i.test(ua)) {
+            window.location.href = "intent://" + window.location.href.replace(/^https?:\/\//, '') + "#Intent;scheme=https;package=com.android.chrome;end";
+        }
+    </script>
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+
+    <a-scene mindar-image="imageTargetSrc: ./target.mind; autoStart: true; uiScanning: no;" color-space="sRGB"
+        renderer="colorManagement: true, physicallyCorrectLights: true" vr-mode-ui="enabled: false"
+        device-orientation-permission-ui="enabled: false">
+
+        <a-assets>
+            <!-- Carrega o modelo 3D desta pasta -->
+            <a-asset-item id="modelo" src="./modelo.glb"></a-asset-item>
+        </a-assets>
+
+        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+        <!-- Iluminação -->
+        <a-light type="ambient" intensity="1.5"></a-light>
+        <a-light type="directional" position="1 2 1" intensity="1.0"></a-light>
+
+        <!-- Objeto 3D ancorado no card -->
+        <a-entity mindar-image-target="targetIndex: 0">
+            <a-gltf-model src="#modelo" position="0 0 0" scale="0.3 0.3 0.3" rotation="0 0 0">
+            </a-gltf-model>
+        </a-entity>
+
+    </a-scene>
+</body>
+
+</html>
